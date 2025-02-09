@@ -6,16 +6,34 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const app = express();
-app.use(cors({ origin: [process.env.CLIENT_URL || "http://localhost:3000", "https://human-ai-art-collab-dev.onrender.com"], credentials: true }));
 app.use(express.json());
+
+const allowedOrigins = [
+    "http://localhost:3000",
+    "https://human-ai-art-collab-dev.onrender.com",
+    "https://human-ai-art-collab-git-main-joshs-projects-c42b813f.vercel.app",
+    "https://human-ai-art-collab.vercel.app/"
+  ];
+  
+  app.use(cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true
+  }));
 
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
-    methods: ["GET", "POST"],
-  },
-});
+    cors: {
+      origin: allowedOrigins,
+      methods: ["GET", "POST"],
+      credentials: true,
+    },
+  });
 
 // 🔹 Connect to MongoDB Atlas
 mongoose.connect(process.env.MONGO_URI, {
