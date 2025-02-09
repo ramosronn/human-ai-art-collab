@@ -6,34 +6,33 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const app = express();
-app.use(express.json());
-
 const allowedOrigins = [
-    "http://localhost:3000",
-    "https://human-ai-art-collab-dev.onrender.com",
-    "https://human-ai-art-collab-git-main-joshs-projects-c42b813f.vercel.app",
-    "https://human-ai-art-collab.vercel.app/"
-  ];
-  
-  app.use(cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true
-  }));
+  process.env.CLIENT_URL || "http://localhost:3000",
+  "https://human-ai-art-collab-dev.onrender.com",
+  "https://human-ai-art-collab.vercel.app"
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+}));
+
+app.use(express.json());
 
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: {
-      origin: allowedOrigins,
-      methods: ["GET", "POST"],
-      credentials: true,
-    },
-  });
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
 
 // 🔹 Connect to MongoDB Atlas
 mongoose.connect(process.env.MONGO_URI, {
@@ -97,6 +96,16 @@ io.on("connection", (socket) => {
   });
 });
 
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 app.get("/rooms", async (req, res) => {
   try {
     const rooms = await Room.find(); // Make sure 'Room' is your Mongoose model
@@ -106,22 +115,22 @@ app.get("/rooms", async (req, res) => {
   }
 });
 
+// ✅ Add route to join or create a room
 app.post("/join-room", async (req, res) => {
-    try {
-      const { username, room } = req.body;
-      console.log("hello")
-      if (!username || !room) {
-        return res.status(400).json({ error: "Username and room name are required" });
-      }
-      let roomData = await Room.findOne({ name: room });
-      if (!roomData) {
-        roomData = await Room.create({ name: room, images: [] });
-      }
-      res.json({ message: "Joined room successfully", roomData });
-    } catch (err) {
-      res.status(500).json({ error: "Database error" });
+  try {
+    const { username, room } = req.body;
+    if (!username || !room) {
+      return res.status(400).json({ error: "Username and room name are required" });
     }
-  });
+    let roomData = await Room.findOne({ name: room });
+    if (!roomData) {
+      roomData = await Room.create({ name: room, images: [] });
+    }
+    res.json({ message: "Joined room successfully", roomData });
+  } catch (err) {
+    res.status(500).json({ error: "Database error" });
+  }
+});
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
