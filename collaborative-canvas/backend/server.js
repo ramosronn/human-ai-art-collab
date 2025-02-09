@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const app = express();
-app.use(cors({ origin: "*" }));
+app.use(cors({ origin: [process.env.CLIENT_URL || "http://localhost:3000", "https://human-ai-art-collab-dev.onrender.com"], credentials: true }));
 app.use(express.json());
 
 const server = http.createServer(app);
@@ -87,6 +87,23 @@ app.get("/rooms", async (req, res) => {
     res.status(500).json({ error: "Database error" });
   }
 });
+
+app.post("/join-room", async (req, res) => {
+    try {
+      const { username, room } = req.body;
+      console.log("hello")
+      if (!username || !room) {
+        return res.status(400).json({ error: "Username and room name are required" });
+      }
+      let roomData = await Room.findOne({ name: room });
+      if (!roomData) {
+        roomData = await Room.create({ name: room, images: [] });
+      }
+      res.json({ message: "Joined room successfully", roomData });
+    } catch (err) {
+      res.status(500).json({ error: "Database error" });
+    }
+  });
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
