@@ -6,11 +6,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: "*" }));
 app.use(express.json());
-
-  
-  
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -20,10 +17,13 @@ const io = new Server(server, {
   },
 });
 
-
 // 🔹 Connect to MongoDB Atlas
-mongoose.connect(process.env.MONGO_URI);
-
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+  .then(() => console.log("MongoDB connected"))
+  .catch(err => console.error("MongoDB connection error:", err));
 
 // ✅ Create Room & User Schema
 const RoomSchema = new mongoose.Schema({
@@ -79,15 +79,14 @@ io.on("connection", (socket) => {
   });
 });
 
-
 app.get("/rooms", async (req, res) => {
-    try {
-      const rooms = await Room.find(); // Make sure 'Room' is your Mongoose model
-      res.json(rooms);
-    } catch (err) {
-      res.status(500).json({ error: "Database error" });
-    }
-  });
+  try {
+    const rooms = await Room.find(); // Make sure 'Room' is your Mongoose model
+    res.json(rooms);
+  } catch (err) {
+    res.status(500).json({ error: "Database error" });
+  }
+});
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
