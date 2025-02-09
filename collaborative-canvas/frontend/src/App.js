@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Moodboard from "./components/Moodboard";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL; 
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 function App() {
   const [username, setUsername] = useState("");
@@ -11,8 +11,7 @@ function App() {
   const joinRoom = async () => {
     if (username.trim() && room.trim()) {
       try {
-        // Check if the room exists or create it on the backend
-        const response = await fetch(`${BACKEND_URL}/join-room`, {
+        const response = await fetch(`${BACKEND_URL}/rooms/join`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, room }),

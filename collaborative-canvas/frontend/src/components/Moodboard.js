@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Stage, Layer, Image } from "react-konva";
 import { io } from "socket.io-client";
 
-const socket = io("https://human-ai-art-collab-dev.onrender.com/");
-
+const socket = io(process.env.REACT_APP_BACKEND_URL || "http://localhost:5000");
 
 const Moodboard = ({ username, room }) => {
   const [images, setImages] = useState([]);
@@ -12,9 +11,7 @@ const Moodboard = ({ username, room }) => {
   useEffect(() => {
     socket.emit("joinRoom", { username, room });
 
-    socket.on("loadImages", (roomImages) => {
-      setImages(roomImages);
-    });
+    socket.on("loadImages", (roomImages) => setImages(roomImages));
 
     socket.on("newImage", (img) => {
       setImages((prev) => [...prev, img]);
@@ -30,13 +27,15 @@ const Moodboard = ({ username, room }) => {
       socket.off("newImage");
       socket.off("updateImage");
       socket.off("loadImages");
+      socket.disconnect();
     };
-    }, [room, username]);
-
+  }, [room, username]);
 
   const addImage = (imageUrl) => {
+    if (!imageUrl) return alert("Please enter a valid image URL!");
+
     const newImage = {
-      id: Date.now(),
+      id: Date.now().toString(),
       url: imageUrl,
       x: Math.random() * 500,
       y: Math.random() * 300,
@@ -79,6 +78,7 @@ const KonvaImage = ({ imgData }) => {
     const img = new window.Image();
     img.src = imgData.url;
     img.onload = () => setImage(img);
+    img.onerror = () => console.error("Failed to load image:", imgData.url);
   }, [imgData.url]);
 
   const handleDragEnd = (e) => {
