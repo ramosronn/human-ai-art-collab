@@ -27,12 +27,19 @@ app.use(express.json());
 
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: {
-    origin: allowedOrigins,
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-});
+    cors: {
+      origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("CORS error: Not allowed by policy"));
+        }
+      },
+      methods: ["GET", "POST"],
+      credentials: true,
+    },
+  });
+  
 
 // 🔹 Connect to MongoDB Atlas
 mongoose.connect(process.env.MONGO_URI, {
