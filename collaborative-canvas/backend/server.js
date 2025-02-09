@@ -18,10 +18,8 @@ const io = new Server(server, {
 });
 
 // 🔹 Connect to MongoDB Atlas
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect(process.env.MONGO_URI);
+
 
 // ✅ Create Room & User Schema
 const RoomSchema = new mongoose.Schema({

@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { Stage, Layer, Image } from "react-konva";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000");
+const socket = io("https://human-ai-art-collab-dev.onrender.com/");
+
 
 const Moodboard = ({ username, room }) => {
   const [images, setImages] = useState([]);
