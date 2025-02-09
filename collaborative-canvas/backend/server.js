@@ -7,7 +7,8 @@ const cors = require("cors");
 
 const app = express();
 const allowedOrigins = [
-  process.env.CLIENT_URL || "http://localhost:3000",
+  process.env.CLIENT_URL,
+  "http://localhost:3000",
   "https://human-ai-art-collab-dev.onrender.com",
   "https://human-ai-art-collab.vercel.app"
 ];
