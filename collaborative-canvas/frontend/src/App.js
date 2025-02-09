@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Moodboard from "./components/Moodboard";
 
-const BACKEND_URL = "https://human-ai-art-collab-dev.onrender.com/"; 
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL; 
 
 function App() {
   const [username, setUsername] = useState("");
