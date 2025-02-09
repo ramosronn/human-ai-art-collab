@@ -9,6 +9,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+  
+  
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -16,6 +19,7 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
+
 
 // 🔹 Connect to MongoDB Atlas
 mongoose.connect(process.env.MONGO_URI);
@@ -74,6 +78,16 @@ io.on("connection", (socket) => {
     console.log("User disconnected:", socket.id);
   });
 });
+
+
+app.get("/rooms", async (req, res) => {
+    try {
+      const rooms = await Room.find(); // Make sure 'Room' is your Mongoose model
+      res.json(rooms);
+    } catch (err) {
+      res.status(500).json({ error: "Database error" });
+    }
+  });
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
