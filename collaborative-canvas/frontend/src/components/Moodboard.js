@@ -2,11 +2,18 @@ import React, { useState, useEffect, useRef } from "react";
 import { Stage, Layer, Image } from "react-konva";
 import { io } from "socket.io-client";
 
-const socket = io(process.env.REACT_APP_BACKEND_URL || "http://localhost:5000");
+const socket = io(process.env.REACT_APP_BACKEND_URL, {
+    transports: ["websocket", "polling"],
+    withCredentials: true,
+  });
 
 const Moodboard = ({ username, room }) => {
   const [images, setImages] = useState([]);
   const stageRef = useRef(null);
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
 
   useEffect(() => {
     socket.emit("joinRoom", { username, room });
@@ -43,30 +50,35 @@ const Moodboard = ({ username, room }) => {
 
     setImages((prev) => [...prev, newImage]);
     socket.emit("newImage", newImage);
+
+    const handleResize = () => {
+        setWindowSize({
+          width: window.innerWidth,
+          height: window.innerHeight,
+        });
+      };
   };
 
   return (
     <div>
       <h2>Moodboard: {room}</h2>
       <p>Welcome, {username}!</p>
-      <input
-        type="text"
-        placeholder="Paste image URL"
-        onKeyDown={(e) => {
-          if (e.key === "Enter") addImage(e.target.value);
-        }}
-      />
+
       <button onClick={() => addImage(prompt("Enter image URL:"))}>
         Add Image
       </button>
 
-      <Stage width={800} height={500} ref={stageRef} style={{ border: "1px solid black" }}>
-        <Layer>
-          {images.map((img) => (
-            <KonvaImage key={img.id} imgData={img} />
-          ))}
-        </Layer>
-      </Stage>
+      <Stage
+      width={windowSize.width}
+      height={windowSize.height}
+      style={{ border: "1px solid black" }}
+    >
+      <Layer>
+        {images.map((img) => (
+          <KonvaImage key={img.id} imgData={img} />
+        ))}
+      </Layer>
+    </Stage>
     </div>
   );
 };

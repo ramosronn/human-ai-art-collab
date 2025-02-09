@@ -11,6 +11,8 @@ function App() {
   const joinRoom = async () => {
     if (username.trim() && room.trim()) {
       try {
+        console.log(BACKEND_URL)
+        console.log("what")
         const response = await fetch(`${BACKEND_URL}/join-room`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
