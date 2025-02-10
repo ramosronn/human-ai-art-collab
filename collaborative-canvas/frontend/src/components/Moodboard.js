@@ -104,8 +104,7 @@ const Moodboard = ({ username, room }) => {
         </button>
       </div>
 
-      {/* Moodboard Canvas (70%) */}
-      <div style={{ width: "70%", height: "100%" }}>
+      <div style={{ width: "100%", height: "100%" }}>
         <Stage width={windowSize.width * 0.7} height={windowSize.height} ref={stageRef}>
           <Layer>
             {images.map((img) => (
