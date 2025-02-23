@@ -51,6 +51,7 @@ function App() {
             onChange={(e) => setRoom(e.target.value)}
           />
           <button onClick={joinRoom}>Join</button>
+          <button>test</button>
         </div>
       ) : (
         <Moodboard username={username} room={room} backendUrl={BACKEND_URL} />
