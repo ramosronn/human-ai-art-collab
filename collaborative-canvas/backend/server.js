@@ -4,6 +4,8 @@ const http = require("http");
 const { Server } = require("socket.io");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const passport = require("passport");
+const session = require("express-session");
 
 const app = express();
 const allowedOrigins = [
@@ -14,35 +16,25 @@ const allowedOrigins = [
 ];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
+  origin: allowedOrigins,
   credentials: true,
 }));
 
 app.use(express.json());
+app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: {
-      origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-          callback(null, true);
-        } else {
-          callback(new Error("CORS error: Not allowed by policy"));
-        }
-      },
-      methods: ["GET", "POST"],
-      credentials: true,
-    },
-  });
-  
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
 
-// 🔹 Connect to MongoDB Atlas
+// Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -50,15 +42,8 @@ mongoose.connect(process.env.MONGO_URI, {
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.error("MongoDB connection error:", err));
 
-// ✅ Create Room & User Schema
-const RoomSchema = new mongoose.Schema({
-  name: String,
-  images: [{ id: String, url: String, x: Number, y: Number }],
-});
-const Room = mongoose.model("Room", RoomSchema);
-
-const users = {}; // Track online users { socketId: username }
-
+// Socket.IO logic
+const users = {};
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
 
@@ -104,41 +89,11 @@ io.on("connection", (socket) => {
   });
 });
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-  next();
-});
-
-app.get("/rooms", async (req, res) => {
-  try {
-    const rooms = await Room.find(); // Make sure 'Room' is your Mongoose model
-    res.json(rooms);
-  } catch (err) {
-    res.status(500).json({ error: "Database error" });
-  }
-});
-
-// ✅ Add route to join or create a room
-app.post("/join-room", async (req, res) => {
-  try {
-    const { username, room } = req.body;
-    if (!username || !room) {
-      return res.status(400).json({ error: "Username and room name are required" });
-    }
-    let roomData = await Room.findOne({ name: room });
-    if (!roomData) {
-      roomData = await Room.create({ name: room, images: [] });
-    }
-    res.json({ message: "Joined room successfully", roomData });
-  } catch (err) {
-    res.status(500).json({ error: "Database error" });
-  }
-});
+// Routes
+const authRoutes = require("./routes/auth");
+const roomRoutes = require("./routes/room");
+app.use("/api", authRoutes);
+app.use("/api", roomRoutes);
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
