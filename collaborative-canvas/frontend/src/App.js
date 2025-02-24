@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
-import { FaEnvelope, FaLock, FcGoogle, FaFacebook } from "react-icons/fa";
+import { FaEnvelope, FaLock, FaFacebook } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
+
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 const socket = io(BACKEND_URL);
