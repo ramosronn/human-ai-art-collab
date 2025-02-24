@@ -3,7 +3,7 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import { FaEnvelope, FaLock, FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-
+import "./App.css";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 const socket = io(BACKEND_URL);
@@ -106,8 +106,8 @@ function App() {
       {!token ? (
         <div>
           <h1>Login or Register</h1>
-          <form onSubmit={handleLogin}>
-            <div>
+          <form onSubmit={handleLogin} className="inline-form">
+            <div id="form">
               <FaEnvelope />
               <input
                 type="email"
@@ -116,7 +116,7 @@ function App() {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div>
+            <div id="form">
               <FaLock />
               <input
                 type="password"
@@ -129,8 +129,8 @@ function App() {
               {loading ? "Logging in..." : "Login"}
             </button>
           </form>
-          <form onSubmit={handleRegister}>
-            <div>
+          <form onSubmit={handleLogin} className="inline-form">
+            <div id="form">
               <FaEnvelope />
               <input
                 type="email"
@@ -139,7 +139,7 @@ function App() {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div>
+            <div id="form">
               <FaLock />
               <input
                 type="password"
