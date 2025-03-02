@@ -12,7 +12,7 @@ const allowedOrigins = [
   process.env.CLIENT_URL,
   "http://localhost:3000",
   "https://human-ai-art-collab-dev.onrender.com",
-  "https://human-ai-art-collab.vercel.app"
+  "https://human-ai-art-collab-khaki.vercel.app"
 ];
 
 app.use(cors({
