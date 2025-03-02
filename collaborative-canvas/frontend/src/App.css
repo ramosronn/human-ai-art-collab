@@ -115,11 +115,6 @@ button {
   transition: background-color 0.3s ease;
 }
 
-div FaEnvelope{
-  flex-wrap: wrap;
-  width: 100%;
-}
-
 button:hover {
   background-color: #2980b9;
 }
@@ -224,26 +219,6 @@ button:disabled {
   margin-right: 0.5rem;
 }
 
-.inline-form button {
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 5px;
-  background-color: #3498db;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.inline-form button:hover {
-  background-color: #2980b9;
-}
-
-.inline-form button:disabled {
-  background-color: #bdc3c7;
-  cursor: not-allowed;
-}
-
 #form {
   display: flex;
   align-items: center;
@@ -252,7 +227,7 @@ button:disabled {
   border-radius: 8px;
   padding: 10px;
   margin: 10px 0;
-  width: 100%;
+  width: 93%;
 }
 
 #form svg {
