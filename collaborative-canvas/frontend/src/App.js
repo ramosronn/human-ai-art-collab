@@ -5,7 +5,7 @@ import { FaEnvelope, FaLock, FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import "./App.css";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const socket = io(BACKEND_URL);
 
 function App() {
