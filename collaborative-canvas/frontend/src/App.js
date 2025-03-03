@@ -3,21 +3,22 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import { FaEnvelope, FaLock, FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
+import JoinRoom from "./JoinRoom"; // Import the new JoinRoom component
+import "./JoinRoom.css"; // Import the JoinRoom CSS
 import "./App.css";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const socket = io(BACKEND_URL);
 
 function App() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
-  const [room, setRoom] = useState("");
   const [joined, setJoined] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [images, setImages] = useState([]);
+  const [userData, setUserData] = useState({ username: "", room: "" });
 
   // Handle user login
   const handleLogin = async (e) => {
@@ -54,12 +55,7 @@ function App() {
   };
 
   // Handle joining a room
-  const joinRoom = async () => {
-    if (!username || !room) {
-      setError("Username and room name are required");
-      return;
-    }
-
+  const handleJoin = async ({ username, room }) => {
     setLoading(true);
     setError("");
 
@@ -67,6 +63,7 @@ function App() {
       const response = await axios.post(`${BACKEND_URL}/api/join-room`, { username, room }, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      setUserData({ username, room });
       setJoined(true);
       setError("");
     } catch (err) {
@@ -102,13 +99,13 @@ function App() {
   }, [joined]);
 
   return (
-    <div>
+    <div className="app-container">
       {!token ? (
         <div>
           <h1>Login or Register</h1>
           <form onSubmit={handleLogin} className="inline-form">
-            <div id="form">
-              <FaEnvelope />
+            <div className="input-group">
+              <FaEnvelope className="icon" />
               <input
                 type="email"
                 placeholder="Email"
@@ -116,8 +113,8 @@ function App() {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div id="form">
-              <FaLock />
+            <div className="input-group">
+              <FaLock className="icon" />
               <input
                 type="password"
                 placeholder="Password"
@@ -129,9 +126,9 @@ function App() {
               {loading ? "Logging in..." : "Login"}
             </button>
           </form>
-          <form onSubmit={handleLogin} className="inline-form">
-            <div id="form">
-              <FaEnvelope />
+          <form onSubmit={handleRegister} className="inline-form">
+            <div className="input-group">
+              <FaEnvelope className="icon" />
               <input
                 type="email"
                 placeholder="Email"
@@ -139,8 +136,8 @@ function App() {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div id="form">
-              <FaLock />
+            <div className="input-group">
+              <FaLock className="icon" />
               <input
                 type="password"
                 placeholder="Password"
@@ -152,40 +149,23 @@ function App() {
               {loading ? "Registering..." : "Register"}
             </button>
           </form>
-          <div>
+          <div className="third-party-buttons">
             <a href={`${BACKEND_URL}/api/auth/google`}>
-              <FcGoogle /> Login with Google
+              <FcGoogle className="icon" /> Login with Google
             </a>
             <a href={`${BACKEND_URL}/api/auth/facebook`}>
-              <FaFacebook /> Login with Facebook
+              <FaFacebook className="icon" /> Login with Facebook
             </a>
           </div>
-          {error && <p style={{ color: "red" }}>{error}</p>}
+          {error && <p className="error-message">{error}</p>}
         </div>
       ) : !joined ? (
-        <div>
-          <h1>Join a Room</h1>
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Room name"
-            value={room}
-            onChange={(e) => setRoom(e.target.value)}
-          />
-          <button onClick={joinRoom} disabled={loading}>
-            {loading ? "Joining..." : "Join Room"}
-          </button>
-          {error && <p style={{ color: "red" }}>{error}</p>}
-        </div>
+        <JoinRoom onJoin={handleJoin} loading={loading} error={error} />
       ) : (
-        <div>
-          <h2>Room: {room}</h2>
-          <div>
+        <div className="room-container">
+          <h2>Welcome, {userData.username}!</h2>
+          <p>You have joined the room: {userData.room}</p>
+          <div className="moodboard">
             {images.map((img) => (
               <img
                 key={img.id}
