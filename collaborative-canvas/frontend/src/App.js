@@ -7,6 +7,8 @@ import JoinRoom from "./JoinRoom"; // Import the new JoinRoom component
 import "./JoinRoom.css"; // Import the JoinRoom CSS
 import "./App.css";
 
+// test
+
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const socket = io(BACKEND_URL);
 
