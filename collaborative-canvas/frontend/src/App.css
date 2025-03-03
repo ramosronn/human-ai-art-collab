@@ -51,6 +51,31 @@ body {
   color: #333;
 }
 
+.app-container {
+  width: 100%;
+  max-width: 1200px;
+  padding: 1rem;
+}
+
+.room-container {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.room-container h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #34495e;
+}
+
+.room-container p {
+  font-size: 1rem;
+  color: #777;
+}
+
 .container {
   background-color: #ffffff;
   padding: 2rem;
@@ -163,6 +188,15 @@ button:disabled {
 }
 
 /* Moodboard Room Styles */
+.moodboard {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
 .moodboard-room {
   margin-top: 1rem;
 }
@@ -206,7 +240,9 @@ button:disabled {
 
 .inline-form {
   display: flex;
-  width: 100%;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .inline-form input[type="email"],
