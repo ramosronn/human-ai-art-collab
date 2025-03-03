@@ -1,37 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Moodboard from "./components/Moodboard";
+import {joinRoom} from "./components/api"
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL =
+process.env.NODE_ENV === 'production'
+  ? process.env.API_URL // production URL set on the server/environment
+  : process.env.API_URL || 'http://localhost:5000'; // fallback for dev
 
 function App() {
   const [username, setUsername] = useState("");
-  const [room, setRoom] = useState("");
+  const [roomCode, setRoomCode] = useState("UJONZK");
+  const [roomData, setRoomData] = useState(null);
   const [joined, setJoined] = useState(false);
 
-  const joinRoom = async () => {
-    if (username.trim() && room.trim()) {
-      try {
-        console.log(BACKEND_URL)
-        console.log("what")
-        const response = await fetch(`${BACKEND_URL}/join-room`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, room }),
-        });
-
-        if (response.ok) {
-          setJoined(true);
-        } else {
-          alert("Failed to join room. Please try again.");
-        }
-      } catch (error) {
-        console.error("Error joining room:", error);
-        alert("Error connecting to the server.");
-      }
-    } else {
-      alert("Please enter a username and room name.");
+  const joinTheRoom = async () => {
+    try {
+      if (!username || !roomCode) return;
+      let newRoomData = await joinRoom(roomCode);
+      setRoomData(newRoomData);
+      console.log('Joined Room:', newRoomData);
+      setJoined(true);
+    } catch (error) {
+      console.error('Error joining room:', error);
     }
-  };
+  }; 
 
   return (
     <div>
@@ -47,13 +39,13 @@ function App() {
           <input
             type="text"
             placeholder="Enter moodboard room name"
-            value={room}
-            onChange={(e) => setRoom(e.target.value)}
+            value={roomCode}
+            onChange={(e) => setRoomCode(e.target.value)}
           />
-          <button onClick={joinRoom}>Join</button>
+          <button onClick={joinTheRoom}>Join</button>
         </div>
       ) : (
-        <Moodboard username={username} room={room} backendUrl={BACKEND_URL} />
+        <Moodboard username={username} roomData={roomData} backendUrl={BACKEND_URL} />
       )}
     </div>
   );
