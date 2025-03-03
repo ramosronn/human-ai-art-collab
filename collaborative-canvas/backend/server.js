@@ -12,7 +12,8 @@ const allowedOrigins = [
   process.env.CLIENT_URL,
   "http://localhost:3000",
   "https://human-ai-art-collab-dev.onrender.com",
-  "https://human-ai-art-collab-khaki.vercel.app"
+  "https://human-ai-art-collab-khaki.vercel.app",
+  "https://human-ai-art-collab-git-main-ramosronns-projects.vercel.app/"
 ];
 
 // Function to check if the origin is a Vercel preview URL
