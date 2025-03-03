@@ -15,9 +15,14 @@ const allowedOrigins = [
   "https://human-ai-art-collab.vercel.app"
 ];
 
+// Function to check if the origin is a Vercel preview URL
+const isVercelPreview = (origin) => {
+  return origin && origin.endsWith(".vercel.app");
+};
+
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin) || isVercelPreview(origin)) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
@@ -34,7 +39,13 @@ app.use(passport.session());
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin) || isVercelPreview(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST"],
     credentials: true,
   },
